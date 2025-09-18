@@ -1,4 +1,6 @@
 import Library from "../models/library.js";
+import Admin from "../models/admin.js";
+
 
 export const createLibrary = async (req, res)=>{
   try{
@@ -11,19 +13,15 @@ export const createLibrary = async (req, res)=>{
       admin: adminId
     });
 
-    // res.status(200).json({ success: true, message: "Library created successfully", data: library });
-
-
-// const { name, address } = req.body;
-
-//     const library = new Library({
-//       name,
-//       address,
-//       admin: req.adminId   // coming from auth middleware after login
-//     });
+     // Update admin's libraries array
+    await Admin.findByIdAndUpdate(
+      req.user.id,
+      { $push: { libraries: library._id } },
+      { new: true }
+    );
 
     await library.save();
-    res.status(201).json({ message: "Library created successfully", data:library });
+    res.status(201).json({ success:true, message: "Library created successfully", data:library });
 
 
   } catch (err) {
