@@ -31,6 +31,8 @@ export const addSeatsToRoom = async (req, res) => {
       seats.push(seat._id);
     }
 
+    
+
     room.seats.push(...seats);
     await room.save();
 
