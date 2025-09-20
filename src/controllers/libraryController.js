@@ -19,11 +19,8 @@ export const createLibrary = async (req, res)=>{
       { $push: { libraries: library._id } },
       { new: true }
     );
-
     await library.save();
     res.status(201).json({ success:true, message: "Library created successfully", data:library });
-
-
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

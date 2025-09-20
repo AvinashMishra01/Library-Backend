@@ -3,12 +3,25 @@ import Library from "../models/library.js";
 
 export const createRoom = async (req, res) => {
   try {
-    const { name, libraryId } = req.body;
+    const {libraryId } = req.params;
+    const {name, totalSeats, roomType}= req.body;
 
-    const room = await Room.create({ name, library: libraryId });
-    await Library.findByIdAndUpdate(libraryId, { $push: { rooms: room._id } });
+    const library=await Library.findById(libraryId);
 
-    res.status(201).json({ success: true, data: room });
+    if(!library)
+    {
+     return res.status(404).json({ success: false, message: "Library not found" });
+    }
+
+        // Create room
+    const room = new Room({ name, totalSeats, roomType, library: libraryId });
+    await room.save();
+
+        library.rooms.push(room._id);
+    await library.save();
+    res.status(201).json({ success: true, data: room , message:'Room Created successfully'});
+
+  
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
@@ -21,4 +34,8 @@ export const getRoomsByLibrary = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+
+
 };
+
+

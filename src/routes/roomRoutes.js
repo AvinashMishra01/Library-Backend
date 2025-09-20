@@ -12,13 +12,14 @@
 import express from "express";
 import {createRoom, getRoomsByLibrary } from "../controllers/roomController.js";
 // import { authMiddleware, roleMiddleware } from "../middleware/authMiddleware.js";
-
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 const router = express.Router();
 // Create a room inside a library (admin only)
 router.post(
-  "/create",
-  // authMiddleware,
-  // roleMiddleware("admin"),
+  "/create/:libraryId",
+  authMiddleware,
+  roleMiddleware(["admin"]),
    createRoom
 );
 
