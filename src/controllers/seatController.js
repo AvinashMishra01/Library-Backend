@@ -23,10 +23,13 @@ export const addSeatsToRoom = async (req, res) => {
     if (!room) {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
-
+const lastSeat = await Seat.find({ room: roomId })
+                           .sort({ number: -1 })
+                           .limit(1);
+let startNumber = lastSeat.length ? lastSeat[0].number + 1 : 1;
     const seats = [];
     for (let i = 0; i < totalSeatLength; i++) {
-      const seat = new Seat({ number: i+1,name: totalSeats[i]?.seatNo , room: roomId,  });
+      const seat = new Seat({ number: startNumber + i,name: totalSeats[i]?.name , room: roomId,  });
       await seat.save();
       seats.push(seat._id);
     }

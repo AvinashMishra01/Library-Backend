@@ -27,9 +27,31 @@ export const createLibrary = async (req, res)=>{
  
 }
 
+export const getLibrariesByAdmin = async (req, res) => {
+  try {
+    // req.user.id comes from authMiddleware (decoded JWT)
+    const adminId = req.user.id;
+
+    // only library
+    const libraries = await Library.find({ admin: adminId })
+    .populate({
+      path: "rooms",
+    select: "name" 
+    });
+    
+
+    res.json({ success: true, data: libraries });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
 export const getLibraries = async (req, res) => {
   try {
-    const libraries = await Library.find().populate("rooms");
+    const libraries = await Library.find({ admin: req.user.id });
+    // const libraries = await Library.find().populate("rooms");
     res.json({ success: true, data: libraries });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

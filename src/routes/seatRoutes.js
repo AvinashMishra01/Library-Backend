@@ -11,7 +11,7 @@
 
 
 import express from "express";
-import {addSeatsToRoom, checkSeatAvailability} from "../controllers/seatController.js";
+import {addSeatsToRoom, checkSeatAvailability, getSeatsByRoom} from "../controllers/seatController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 
@@ -24,6 +24,12 @@ router.post(
   roleMiddleware(["admin"]),
   addSeatsToRoom
 );
+
+router.get('/:roomId', 
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  getSeatsByRoom
+)
 
 // Check seat availability
 router.get("/:id/availability",

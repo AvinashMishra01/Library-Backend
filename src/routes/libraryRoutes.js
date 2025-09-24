@@ -1,5 +1,5 @@
 import express from "express";
-import {getLibraryById, getLibraries, createLibrary} from "../controllers/libraryController.js";
+import {getLibraryById, getLibraries, createLibrary, getLibrariesByAdmin} from "../controllers/libraryController.js";
 import { authMiddleware, } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 const router = express.Router();
@@ -9,10 +9,18 @@ router.post('/create', authMiddleware,roleMiddleware(["admin"]), createLibrary)
 
 
 router.get("/",
-    //  authMiddleware,
+     authMiddleware,
     getLibraries);
+    
 router.get("/:id", 
-    // authMiddleware,
+    authMiddleware,
    getLibraryById);
+
+router.get(
+  "/admin/libraries",
+  authMiddleware,
+  roleMiddleware(["admin"]),   // only admins
+  getLibrariesByAdmin
+);
 
 export default router; 

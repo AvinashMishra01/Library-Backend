@@ -29,7 +29,7 @@ export const createRoom = async (req, res) => {
 
 export const getRoomsByLibrary = async (req, res) => {
   try {
-    const rooms = await Room.find({ library: req.params.libraryId }).populate("seats");
+    const rooms = await Room.find({ library: req.params.libraryId });
     res.json({ success: true, data: rooms });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
