@@ -1,4 +1,6 @@
 import Library from "../models/library.js";
+import Admin from "../models/admin.js";
+
 
 export const createLibrary = async (req, res)=>{
   try{
@@ -11,30 +13,45 @@ export const createLibrary = async (req, res)=>{
       admin: adminId
     });
 
-    // res.status(200).json({ success: true, message: "Library created successfully", data: library });
-
-
-// const { name, address } = req.body;
-
-//     const library = new Library({
-//       name,
-//       address,
-//       admin: req.adminId   // coming from auth middleware after login
-//     });
-
+     // Update admin's libraries array
+    await Admin.findByIdAndUpdate(
+      req.user.id,
+      { $push: { libraries: library._id } },
+      { new: true }
+    );
     await library.save();
-    res.status(201).json({ message: "Library created successfully", data:library });
-
-
+    res.status(201).json({ success:true, message: "Library created successfully", data:library });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
  
 }
 
+export const getLibrariesByAdmin = async (req, res) => {
+  try {
+    // req.user.id comes from authMiddleware (decoded JWT)
+    const adminId = req.user.id;
+
+    // only library
+    const libraries = await Library.find({ admin: adminId })
+    .populate({
+      path: "rooms",
+    select: "name" 
+    });
+    
+
+    res.json({ success: true, data: libraries });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
 export const getLibraries = async (req, res) => {
   try {
-    const libraries = await Library.find().populate("rooms");
+    const libraries = await Library.find({ admin: req.user.id });
+    // const libraries = await Library.find().populate("rooms");
     res.json({ success: true, data: libraries });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

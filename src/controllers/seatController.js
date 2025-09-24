@@ -1,18 +1,6 @@
 import Seat from "../models/Seat.js";
 import Room from "../models/Room.js";
 
-export const addSeat = async (req, res) => {
-  try {
-    const { number, roomId, libraryId } = req.body;
-
-    const seat = await Seat.create({ number, room: roomId, library: libraryId });
-    await Room.findByIdAndUpdate(roomId, { $push: { seats: seat._id } });
-
-    res.status(201).json({ success: true, data: seat });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
 
 export const checkSeatAvailability = async (req, res) => {
   try {
@@ -20,6 +8,48 @@ export const checkSeatAvailability = async (req, res) => {
     if (!seat) return res.status(404).json({ message: "Seat not found" });
 
     res.json({ success: true, available: seat.isAvailable });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+export const addSeatsToRoom = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const { totalSeats } = req.body || [];
+    const totalSeatLength= totalSeats?.length
+    const room = await Room.findById(roomId);
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+const lastSeat = await Seat.find({ room: roomId })
+                           .sort({ number: -1 })
+                           .limit(1);
+let startNumber = lastSeat.length ? lastSeat[0].number + 1 : 1;
+    const seats = [];
+    for (let i = 0; i < totalSeatLength; i++) {
+      const seat = new Seat({ number: startNumber + i,name: totalSeats[i]?.name , room: roomId,  });
+      await seat.save();
+      seats.push(seat._id);
+    }
+
+    
+
+    room.seats.push(...seats);
+    await room.save();
+
+    res.status(201).json({ success: true, message: `${totalSeatLength} seats added`, data: room });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getSeatsByRoom = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const seats = await Seat.find({ room: roomId });
+    res.json({ success: true, data: seats });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
