@@ -100,7 +100,7 @@
 import {generateToken, verifyToken} from "../utils/jwt.js";
 import bcrypt from "bcryptjs";
 import Admin from "../models/admin.js";
-import User from "../models/User.js";
+import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 // ==========================
 // Admin Signup/Login
@@ -166,12 +166,11 @@ export const adminLogin = async (req, res) => {
 // ==========================
 export const userSignup = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password } = req.body;
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashed, phone });
-
-    res.status(201).json({ success: true, data: user });
+    const user = await User.create({ name, email, password: hashed, mainpssword:password });
+    res.status(201).json({ success: true, data: user, message:'User Created Successfully' });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
