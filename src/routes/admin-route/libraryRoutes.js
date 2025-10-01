@@ -1,7 +1,7 @@
 import express from "express";
-import {getLibraryById, getLibraries, createLibrary, getLibrariesByAdmin} from "../controllers/libraryController.js";
-import { authMiddleware, } from "../middlewares/authMiddleware.js";
-import { roleMiddleware } from "../middlewares/roleMiddleware.js";
+import {getLibraryById, getLibraries, createLibrary, getLibrariesByAdmin} from "../../controllers/admin-controller/libraryController.js";
+import { authMiddleware, } from "../../middlewares/authMiddleware.js";
+import { roleMiddleware } from "../../middlewares/roleMiddleware.js";
 const router = express.Router();
 
 router.post('/create', authMiddleware,roleMiddleware(["admin"]), createLibrary)

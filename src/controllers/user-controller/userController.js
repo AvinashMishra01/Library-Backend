@@ -1,15 +1,15 @@
-// import User from "../models/user.model.js";
-
-// // ➡️ Create new user
-// export const createUser = async (req, res) => {
-//   try {
-//     const user = new User(req.body);
-//     await user.save();
-//     res.status(201).json({ success: true, message: "User created successfully", data: user });
-//   } catch (error) {
-//     res.status(400).json({ success: false, message: "User not created", mainError:error.message });
-//   }
-// };
+import User from "../../models/user-panel/user.js";
+import  Booking from "../../models/admin-panel/Booking.js";
+// ➡️ Create new user
+export const createUser = async (req, res) => {
+  try {
+    const user = new User(req.body);
+    await user.save();
+    res.status(201).json({ success: true, message: "User created successfully", data: user });
+  } catch (error) {
+    res.status(400).json({ success: false, message: "User not created", mainError:error.message });
+  }
+};
 
 // // ➡️ Get all users
 // export const getUsers = async (req, res) => {
@@ -56,7 +56,7 @@
 
 
 // import  User from "../models/user";
-import  Booking from "../models/Booking.js";
+
 
 export const getUserBookings = async (req, res) => {
   try {

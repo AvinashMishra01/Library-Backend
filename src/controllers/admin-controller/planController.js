@@ -19,8 +19,8 @@
 //     res.status(500).json({ success: false, message: err.message });
 //   }
 // };
-import Plan from "../models/Plan.js";
-import Library from "../models/Library.js";
+import Plan from "../../models/admin-panel/Plan.js";
+import Library from "../../models/admin-panel/Library.js";
 
 // Create a new plan for a library
 export const createPlan = async (req, res) => {

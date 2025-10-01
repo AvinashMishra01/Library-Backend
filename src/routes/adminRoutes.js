@@ -1,5 +1,5 @@
 import  express from "express";
-import  {createLibrary} from "../controllers/adminController.js";
+import  {createLibrary} from "../controllers/admin-controller/adminController.js";
 // import { authMiddleware, roleMiddleware } from "../middleware/authMiddleware";
 
 const router = express.Router();

@@ -43,13 +43,13 @@ import connectDB from "./config/db.js"
 
 
 // controllers 
-import authRoute from "./routes/authRoutes.js";
+import authRoute from "./routes/auth-route/authRoutes.js";
 import adminRoute from "./routes/adminRoutes.js";
-import libraryRoute from "./routes/libraryRoutes.js";
-import roomRoute from "./routes/roomRoutes.js";
-import seatRoute from "./routes/seatRoutes.js";
-import userRoute from "./routes/userRoutes.js";
-import planRoute from "./routes/planRoutes.js";
+import libraryRoute from "./routes/admin-route/libraryRoutes.js";
+import roomRoute from "./routes/admin-route/roomRoutes.js";
+import seatRoute from "./routes/admin-route/seatRoutes.js";
+import userRoute from "./routes/user-route/userRoutes.js";
+import planRoute from "./routes/admin-route/planRoutes.js";
 import bookingRoute from "./routes/bookingRoutes.js";
 // import cronJob from "./jobs/planExpiryJob.js"
 // Load env vars

@@ -10,10 +10,10 @@
 // export default router;
 
 import express from "express";
-import {createRoom, getRoomsByLibrary } from "../controllers/roomController.js";
+import {createRoom, getRoomsByLibrary } from "../../controllers/admin-controller/roomController.js";
 // import { authMiddleware, roleMiddleware } from "../middleware/authMiddleware.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { roleMiddleware } from "../middlewares/roleMiddleware.js";
+import { authMiddleware } from "../../middlewares/authMiddleware.js";
+import { roleMiddleware } from "../../middlewares/roleMiddleware.js";
 const router = express.Router();
 // Create a room inside a library (admin only)
 router.post(

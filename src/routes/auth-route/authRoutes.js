@@ -10,7 +10,7 @@
 
 
 import  express from "express";
-import {adminLogin,adminSignup, userLogin, userSignup } from "../controllers/authControllers.js";
+import {adminLogin,adminSignup, userLogin, userSignup } from "../../controllers/auth-controller/authControllers.js";
 
 const router = express.Router();
 // Admin

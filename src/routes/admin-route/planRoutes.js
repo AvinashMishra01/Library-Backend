@@ -18,9 +18,9 @@
 
 // export default router; 
 import express from "express";
-import { createPlan, getPlansByLibrary, updatePlan, deletePlan, updateStatus } from "../controllers/planController.js";
-import { authMiddleware, } from "../middlewares/authMiddleware.js";
-import { roleMiddleware } from "../middlewares/roleMiddleware.js";
+import { createPlan, getPlansByLibrary, updatePlan, deletePlan, updateStatus } from "../../controllers/admin-controller/planController.js";
+import { authMiddleware, } from "../../middlewares/authMiddleware.js";
+import { roleMiddleware } from "../../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 

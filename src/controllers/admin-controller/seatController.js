@@ -1,5 +1,5 @@
-import Seat from "../models/Seat.js";
-import Room from "../models/Room.js";
+import Seat from "../../models/admin-panel/Seat.js";
+import Room from "../../models/admin-panel/Room.js";
 
 
 export const checkSeatAvailability = async (req, res) => {

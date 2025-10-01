@@ -97,10 +97,10 @@
 
 
 
-import {generateToken, verifyToken} from "../utils/jwt.js";
+import {generateToken, verifyToken} from "../../utils/jwt.js";
 import bcrypt from "bcryptjs";
-import Admin from "../models/admin.js";
-import User from "../models/user.js";
+import Admin from "../../models/admin-panel/Admin.js";
+import User from "../../models/user-panel/user.js";
 import jwt from "jsonwebtoken";
 // ==========================
 // Admin Signup/Login
