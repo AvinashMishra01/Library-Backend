@@ -1,25 +1,15 @@
-// const mongoose = require('mongoose');
-
-// const planSchema = new mongoose.Schema(
-//   {
-//     name: { type: String, required: true }, // Basic, Premium, etc.
-//     price: { type: Number, required: true },
-//     duration: { type: Number, required: true }, // in days
-//     maxSeats: { type: Number }, // optional
-//     features: [{ type: String }],
-//   },
-//   { timestamps: true }
-// );
-
-// module.exports = mongoose.model('Plan', planSchema);
 import mongoose from "mongoose";
 
 const planSchema = new mongoose.Schema({
-  name: String, // e.g. "Monthly", "Hourly"
-  price: Number,
-  durationInHours: Number, // how long the plan allows booking
-  library: { type: mongoose.Schema.Types.ObjectId, ref: "Library" }
+  name: { type: String, required: true },       // e.g. "Monthly", "Yearly", "Special"
+  description: { type: String },                // e.g. "Flat 30% discount"
+  price: { type: Number, required: true },      // e.g. 400
+  isActive: { type :String, 
+    enum:['0', '1'],
+    default:'1'  },
+  libraryId: { type: mongoose.Schema.Types.ObjectId, ref: "Library", required: true },
 }, { timestamps: true });
 
 const Plan = mongoose.model("Plan", planSchema);
-export default Plan
+export default Plan;
+

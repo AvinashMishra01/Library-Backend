@@ -1,4 +1,4 @@
-import Library from "../models/library.js";
+import Library from "../models/Library.js";
 import Admin from "../models/admin.js";
 
 
