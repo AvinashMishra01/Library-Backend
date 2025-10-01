@@ -1,5 +1,5 @@
 import Admin from "../models/admin.js";
-import Library from "../models/library.js";
+import Library from "../models/Library.js";
 // import Room from "../models/Room";
 // import Seat from "../models/Seat";
 

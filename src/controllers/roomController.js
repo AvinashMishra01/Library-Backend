@@ -1,5 +1,5 @@
 import Room from "../models/Room.js";
-import Library from "../models/library.js";
+import Library from "../models/Library.js";
 
 export const createRoom = async (req, res) => {
   try {

@@ -20,7 +20,8 @@ const librarySchema = new mongoose.Schema({
   name: String,
   address: String,
   admin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
-  rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }]
+  rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
+   plans: [{ type: mongoose.Schema.Types.ObjectId, ref: "Plan" }],
 }, { timestamps: true });
 
 // module.exports = mongoose.model("Library", librarySchema);
