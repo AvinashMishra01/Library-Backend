@@ -25,7 +25,7 @@ import Library from "../../models/admin-panel/Library.js";
 // Create a new plan for a library
 export const createPlan = async (req, res) => {
   try {
-    const { name, description, price, libraryId } = req.body;
+    const { name, description, price,durationInDays, libraryId } = req.body;
 
     // validate library exists
     const lib = await Library.findById(libraryId);
@@ -33,7 +33,7 @@ export const createPlan = async (req, res) => {
       return res.status(404).json({ success: false, message: "Library not found" });
     }
 
-    const plan = new Plan({ name, description, price, libraryId });
+    const plan = new Plan({ name, description, price,durationInDays, libraryId });
     await plan.save();
     
     lib.plans.push(plan._id);

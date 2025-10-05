@@ -187,6 +187,13 @@ export const userLogin = async (req, res) => {
     if (!match) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = generateToken({ id: user._id, role: "user" });
+    
+        // Save login log
+    await LoginLog.create({
+      userId: user._id,
+      ipAddress: req.ip,
+      deviceInfo: req.headers["user-agent"]
+    });
 
     res.json({ success: true, token, user });
   } catch (err) {
