@@ -97,10 +97,10 @@
 
 
 
-import {generateToken, verifyToken} from "../utils/jwt.js";
+import {generateToken, verifyToken} from "../../utils/jwt.js";
 import bcrypt from "bcryptjs";
-import Admin from "../models/admin.js";
-import User from "../models/User.js";
+import Admin from "../../models/admin-panel/Admin.js";
+import User from "../../models/user-panel/user.js";
 import jwt from "jsonwebtoken";
 // ==========================
 // Admin Signup/Login
@@ -166,12 +166,11 @@ export const adminLogin = async (req, res) => {
 // ==========================
 export const userSignup = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password } = req.body;
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashed, phone });
-
-    res.status(201).json({ success: true, data: user });
+    const user = await User.create({ name, email, password: hashed, mainpssword:password });
+    res.status(201).json({ success: true, data: user, message:'User Created Successfully' });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
@@ -188,6 +187,13 @@ export const userLogin = async (req, res) => {
     if (!match) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = generateToken({ id: user._id, role: "user" });
+    
+        // Save login log
+    await LoginLog.create({
+      userId: user._id,
+      ipAddress: req.ip,
+      deviceInfo: req.headers["user-agent"]
+    });
 
     res.json({ success: true, token, user });
   } catch (err) {

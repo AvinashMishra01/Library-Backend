@@ -11,9 +11,9 @@
 
 
 import express from "express";
-import {addSeatsToRoom, checkSeatAvailability, getSeatsByRoom} from "../controllers/seatController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { roleMiddleware } from "../middlewares/roleMiddleware.js";
+import {addSeatsToRoom, checkSeatAvailability, getSeatsByRoom} from "../../controllers/admin-controller/seatController.js";
+import { authMiddleware } from "../../middlewares/authMiddleware.js";
+import { roleMiddleware } from "../../middlewares/roleMiddleware.js";
 
 
 const router = express.Router();

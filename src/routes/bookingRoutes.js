@@ -11,7 +11,7 @@
 
 
 import express from "express";
-import {cancelBooking, bookSeat} from "../controllers/bookingController.js";
+import {cancelBooking, bookSeat} from "../controllers/admin-controller/bookingController.js";
 // import { authMiddleware, roleMiddleware } from "../middleware/authMiddleware";
 
 const router = express.Router();

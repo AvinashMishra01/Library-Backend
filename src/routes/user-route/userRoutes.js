@@ -13,16 +13,23 @@
 
 
 import express from "express";
-import {getUserBookings} from "../controllers/userController.js";
+import {getUserBookings,registerUser, getAllUsers} from "../../controllers/user-controller/userController.js";
+import { authMiddleware } from "../../middlewares/authMiddleware.js";
+import { roleMiddleware } from "../../middlewares/roleMiddleware.js";
 // import { authMiddleware, roleMiddleware } from "../middleware/authMiddleware";
 
 const router = express.Router();
+
+router.get("/", authMiddleware, roleMiddleware(["admin"]), getAllUsers) // get all user list active inactive pagination also 
+
+router.post("/create", authMiddleware, roleMiddleware(["admin"]), registerUser);       // Create user
+
 // Get user bookings
-router.get(
-  "/bookings",
+router.get("/bookings",
   // authMiddleware,
   // roleMiddleware("user"),
   getUserBookings
 );
+
 
 export default router; 

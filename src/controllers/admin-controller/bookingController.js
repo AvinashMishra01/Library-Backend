@@ -1,5 +1,5 @@
-import Booking from "../models/Booking.js";
-import Seat from "../models/Seat.js";
+import Booking from "../../models/admin-panel/Booking.js";
+import Seat from "../../models/admin-panel/Seat.js";
 
 export const bookSeat = async (req, res) => {
   try {

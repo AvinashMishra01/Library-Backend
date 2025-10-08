@@ -1,5 +1,5 @@
-import Library from "../models/Library.js";
-import Admin from "../models/admin.js";
+import Library from "../../models/admin-panel/Library.js";
+import Admin from "../../models/admin-panel/Admin.js";
 
 
 export const createLibrary = async (req, res)=>{

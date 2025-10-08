@@ -7,6 +7,7 @@ const planSchema = new mongoose.Schema({
   isActive: { type :String, 
     enum:['0', '1'],
     default:'1'  },
+  durationInDays: { type: Number, required: true },
   libraryId: { type: mongoose.Schema.Types.ObjectId, ref: "Library", required: true },
 }, { timestamps: true });
 
