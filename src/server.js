@@ -51,6 +51,9 @@ import seatRoute from "./routes/admin-route/seatRoutes.js";
 import userRoute from "./routes/user-route/userRoutes.js";
 import planRoute from "./routes/admin-route/planRoutes.js";
 import bookingRoute from "./routes/bookingRoutes.js";
+import paymentRoute from "./routes/payment/paymentRoutes.js"
+
+
 // import cronJob from "./jobs/planExpiryJob.js"
 // Load env vars
 dotenv.config();
@@ -73,6 +76,7 @@ app.use("/api/seats", seatRoute);
 app.use("/api/users", userRoute);
 app.use("/api/plans", planRoute);
 app.use("/api/bookings", bookingRoute);
+app.use("/api/payment", paymentRoute )
 
 // Import Jobs (cron will auto-run on import)
 // require("./jobs/planExpiryJob");
