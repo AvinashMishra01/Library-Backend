@@ -9,9 +9,12 @@ const paymentSchema = new mongoose.Schema({
   paymentMode: { type: String, enum: ["cash", "upi", "card"], default: "cash" },
 
   // Track payment status against that plan’s price
-  paymentStatus: { type: String, default: false },
-
+  paymentStatus: { type: Boolean, default: false },
   // Remaining balance at the time of payment
+
+   startDate: { type: Date, required:true }, // when subscription started for this user
+   endDate:   { type: Date, required:true },
+
   remainingDue: { type: Number, default: 0 }
 }, { timestamps: true });
 

@@ -20,6 +20,9 @@ export const addPayment = async (req, res) => {
     // 🔍 Validate library
     const library = await Library.findById(libraryId);
     if (!library) return res.status(404).json({ success: false, message: "Library not found" });
+ // 📅 Calculate end date from plan duration
+    const planValidity = calculateEndDate(startDate, plan.durationInDays);
+
 
     // 💾 Save payment
     const payment = new Payment({
@@ -29,13 +32,14 @@ export const addPayment = async (req, res) => {
       amountPaid,
       paymentMode,
       paymentStatus: true,
-      remainingDue
+      remainingDue,
+      startDate: startDate,
+      endDate: planValidity?.planEnd
     });
 
     await payment.save();
 
-    // 📅 Calculate end date from plan duration
-    const planValidity = calculateEndDate(startDate, plan.durationInDays);
+   
 
     // 🔍 Find if user already has an entry for this library
     const existingLibraryPlan = user.subscriptions.find(
@@ -137,3 +141,127 @@ export const getUserDue = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+
+export const getUserDueHistory = async (req, res) => {
+  try {
+    const { paymentIds } = req.body;
+
+    if (!Array.isArray(paymentIds) || !paymentIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: "paymentIds array is required",
+      });
+    }
+
+    // Fetch payment details
+    const payments = await Payment.find({ _id: { $in: paymentIds } })
+      .populate("planId", "name durationInDays price")
+      .populate("libraryId", "name address")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!payments.length) {
+      return res.status(404).json({ success: false, message: "No payments found" });
+    }
+
+    // Build response
+    const results = payments.map(payment => ({
+      paymentId: payment._id,
+      amountPaid: payment.amountPaid,
+      dueAmount: payment.remainingDue ?? 0,
+      paymentMode: payment.paymentMode,
+      paymentStatus: payment.paymentStatus,
+      paymentDate: payment.paymentDate,
+      startDate: payment.startDate,
+      endDate: payment.endDate,
+      plan: payment.planId
+        ? {
+            name: payment.planId.name,
+            durationInDays: payment.planId.durationInDays,
+            price: payment.planId.price,
+          }
+        : null,
+      library: payment.libraryId
+        ? {
+            name: payment.libraryId.name,
+            address: payment.libraryId.address,
+          }
+        : null,
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: results.length,
+      dueHistory: results,
+    });
+  } catch (error) {
+    console.error("❌ getUserDueHistory error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const clearAllDue = async ( req, res)=>{
+  console.log("clear due call ");
+  
+   try {
+    const { userId, paymentIds } = req.body;
+
+    if (!Array.isArray(paymentIds) || !paymentIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: "paymentIds array is required",
+      });
+    }
+   const payments = await Payment.find({ _id: { $in: paymentIds } }).lean();
+
+       if (!payments.length) {
+      return res.status(404).json({ success: false, message: "No payments found" });
+    }
+
+   
+    // 2️⃣ Update all payments → mark dues as cleared
+    await Payment.updateMany(
+      { _id: { $in: paymentIds } },
+      { $set: { remainingDue: 0, paymentStatus: true } }
+    );
+   const users = await User.findById(userId)
+ if(!users)
+ {
+        return res.status(404).json({ success: false, message: "No user found" });
+
+ }
+   
+   // 4️⃣ For each subscription, remove cleared payments and update totalDue
+    users.subscriptions.forEach(sub => {
+      // Calculate how much due we are clearing in this subscription
+      let clearedAmount = 0;
+
+      sub.duePayments = sub.duePayments.filter(dp => {
+        const isCleared = paymentIds.includes(dp.paymentId.toString());
+        if (isCleared) clearedAmount += dp.dueAmount || 0;
+        return !isCleared;
+      });
+
+      // Subtract clearedAmount from totalDue
+      if (clearedAmount > 0) {
+        sub.totalDue = Math.max(0, (sub.totalDue || 0) - clearedAmount);
+      }
+    });
+
+    await users.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Dues cleared successfully",
+    });
+  }
+  catch (error) {
+    console.error("❌ clear due  error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+    
+
+}
+

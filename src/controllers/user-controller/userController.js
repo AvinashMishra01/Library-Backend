@@ -152,6 +152,8 @@ export const registerUser = async (req, res) => {
       paymentMode,
       paymentStatus: true,
       remainingDue,
+      startDate,
+      endDate: planValidity?.planEnd,
     });
 
     await payment.save();
