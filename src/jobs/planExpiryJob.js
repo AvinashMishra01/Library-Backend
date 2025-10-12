@@ -1,37 +1,50 @@
-// jobs/planExpiryJob.js
-const cron = require("node-cron");
-const Booking = require("../models/Booking");
-const Seat = require("../models/Seat");
+import cron from "node-cron";
+import User from "../models/user-panel/user.js";
+import ExpiredLog from "../models/cron-job/ExpiredLog.js";
 
-// Run every night at midnight
-cron.schedule("0 0 * * *", async () => {
-  console.log("⏳ Running plan expiry job...");
+cron.schedule("*/20 * * * *", async () => { // for 1 min 
+// cron.schedule("0 0 * * *", async () => { // for nid night
+  console.log("⏰ Cron started: Checking expired subscriptions...");
 
   try {
-    const now = new Date();
+    const today = new Date();
+    const users = await User.find({ "subscriptions.status": true })
+      .populate("subscriptions.planId", "name")
+      .populate("subscriptions.libraryId", "name");
 
-    // Find expired bookings
-    const expiredBookings = await Booking.find({
-      endTime: { $lte: now },
-      status: "active",
-    });
+    let updatedCount = 0;
+    let logCount = 0;
 
-    for (let booking of expiredBookings) {
-      // Mark booking as expired
-      booking.status = "expired";
-      await booking.save();
+    for (const user of users) {
+      let modified = false;
 
-      // Free the seat
-      await Seat.findByIdAndUpdate(booking.seat, {
-        isAvailable: true,
-        currentBooking: null,
-      });
+      for (const sub of user.subscriptions) {
+        if (sub.endDate && new Date(sub.endDate) < today && sub.status) {
+          // Log expired plan before marking it inactive
+          await ExpiredLog.create({
+            userId: user._id,
+            libraryId: sub.libraryId?._id,
+            planId: sub.planId?._id,
+            seatNo: sub.seatNo,
+            totalDue: sub.totalDue || 0,
+            previousEndDate: sub.endDate,
+          });
+          logCount++;
 
-      console.log(`✅ Booking ${booking._id} expired & seat freed.`);
+          // Mark subscription inactive
+          sub.status = false;
+          modified = true;
+        }
+      }
+
+      if (modified) {
+        await user.save();
+        updatedCount++;
+      }
     }
 
-    console.log("✔ Plan expiry job completed.");
-  } catch (err) {
-    console.error("❌ Error in planExpiryJob:", err.message);
+    console.log(`✅ Cron completed: ${updatedCount} users updated, ${logCount} logs created.`);
+  } catch (error) {
+    console.error("❌ Error in expired plan cron:", error);
   }
 });

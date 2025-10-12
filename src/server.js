@@ -53,7 +53,7 @@ import planRoute from "./routes/admin-route/planRoutes.js";
 import bookingRoute from "./routes/bookingRoutes.js";
 import paymentRoute from "./routes/payment/paymentRoutes.js"
 
-
+import "./jobs/planExpiryJob.js";
 // import cronJob from "./jobs/planExpiryJob.js"
 // Load env vars
 dotenv.config();
