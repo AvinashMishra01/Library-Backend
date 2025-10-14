@@ -446,7 +446,7 @@ export const getUserPaymentHistory = async (req, res) => {
 
       // Totals
       grouped[key].totalPaid += p.amountPaid;
-      grouped[key].totalDue = p.remainingDue; // last payment’s due
+      grouped[key].totalDue += p.remainingDue; // last payment’s due
       if (p.remainingDue > 0) grouped[key].isCleared = false;
     }
 
