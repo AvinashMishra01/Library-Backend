@@ -391,7 +391,7 @@ export const clearAllDue = async (req, res) => {
 
 export const getUserPaymentHistory = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId  = req.query?.userId || req.user.id;
 
     if (!userId) {
       return res.status(400).json({ success: false, message: "User ID is required" });

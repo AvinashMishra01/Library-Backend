@@ -13,7 +13,7 @@
 
 
 import express from "express";
-import {getUserBookings,registerUser, getAllUsers, inactiveUser} from "../../controllers/user-controller/userController.js";
+import {getUserBookings,registerUser, getAllUsers, inactiveUser, userDetails} from "../../controllers/user-controller/userController.js";
 import { authMiddleware } from "../../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../../middlewares/roleMiddleware.js";
 // import { authMiddleware, roleMiddleware } from "../middleware/authMiddleware";
@@ -25,6 +25,11 @@ router.get("/", authMiddleware, roleMiddleware(["admin"]), getAllUsers) // get a
 router.post("/create", authMiddleware, roleMiddleware(["admin"]), registerUser);       // Create user
 
  router.post('/inactive-user', authMiddleware, roleMiddleware(["admin"]),inactiveUser )
+
+
+ router.get('/user-detail', authMiddleware, roleMiddleware(["user"]), userDetails)
+
+
 
 // Get user bookings
 router.get("/bookings",

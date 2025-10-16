@@ -101,6 +101,7 @@ import {generateToken, verifyToken} from "../../utils/jwt.js";
 import bcrypt from "bcryptjs";
 import Admin from "../../models/admin-panel/Admin.js";
 import User from "../../models/user-panel/user.js";
+import LoginLog from "../../models/user-panel/LoginLogs.js";
 import jwt from "jsonwebtoken";
 // ==========================
 // Admin Signup/Login
@@ -176,27 +177,82 @@ export const userSignup = async (req, res) => {
   }
 };
 
+// export const userLogin = async (req, res) => {
+//   try {
+//     const { mobileNo, password } = req.body;
+
+//     const user = await User.findOne({ mobileNo });
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     const match = await bcrypt.compare(password, user.password);
+//     if (!match) return res.status(401).json({ message: "Invalid credentials" });
+
+//     const token = generateToken({ id: user._id, role: "user" });
+    
+//         // Save login log
+//     await LoginLog.create({
+//       userId: user._id,
+//       ipAddress: req.ip,
+//       deviceInfo: req.headers["user-agent"]
+//     });
+
+//     res.json({ success: true, token, user });
+//   } catch (err) {
+//     res.status(400).json({ success: false, message: err.message });
+//   }
+// };
+
+
 export const userLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { mobileNo, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await User.findOne({ mobileNo });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ message: "Invalid credentials" });
+    if (!match)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = generateToken({ id: user._id, role: "user" });
-    
-        // Save login log
-    await LoginLog.create({
-      userId: user._id,
-      ipAddress: req.ip,
-      deviceInfo: req.headers["user-agent"]
+      const token = jwt.sign({ id: user._id, role: "user" }, process.env.JWT_SECRET, {
+      expiresIn: "7d"
     });
 
-    res.json({ success: true, token, user });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    // ✅ Capture client IP (works for mobile, laptop, or any device)
+    const ipAddress =
+      req.headers['x-forwarded-for']?.split(',').shift() ||
+      req.socket?.remoteAddress ||
+      null;
+
+    // ✅ Capture device/browser info
+    const deviceInfo = req.headers["user-agent"];
+
+    // ✅ Save login log
+    await LoginLog.create({
+      userId: user._id,
+      ipAddress,
+      deviceInfo,
+    });
+
+     let response= {
+        token:token,
+        role:'user',
+
+      }
+ return  res.status(200).json({ success: true, data: response, message:'Login Successfully' });
+
+    // return res.status(200).json({
+    //   message: "Login successful",
+    //   token,
+    //   user: {
+    //     id: user._id,
+    //     name: user.name,
+    //     role: "user",
+    //   },
+    // });
+  } catch (error) {
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

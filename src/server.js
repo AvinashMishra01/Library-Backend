@@ -66,6 +66,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json()); // body parser
+app.set('trust proxy', true);
 
 // Routes
 app.use("/api/auth", authRoute);

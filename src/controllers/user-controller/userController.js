@@ -276,8 +276,6 @@ export const getAllUsers = async (req, res) => {
 
 
 // inactive user 
-
-
 export const inactiveUser= async ( req, res) =>{
   try{
  const {userId}=  req.body;
@@ -299,47 +297,174 @@ export const inactiveUser= async ( req, res) =>{
 
   } catch (error) {
     console.error("Error updating user status:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Error while inactive user please try after some time.", status:false, error:error });
   }
    
 }
 
 
-// // ➡️ Get single user by ID
-// export const getUserById = async (req, res) => {
+// user details 
+export const userDetails= async (req, res)=>{
+
+try {
+  const userId = req.user.id;
+
+  const user = await User.findById(userId)
+    .populate("subscriptions.planId", "name price description")
+    .populate("subscriptions.libraryId", "name address")
+    .lean();
+
+  if (!user)
+    return res
+      .status(404)
+      .json({ message: "User details not found", status: false });
+
+  // ✅ Rename populated fields
+  user.subscriptions = user.subscriptions.map(sub => {
+    const { planId, libraryId, ...rest } = sub;
+    return {
+      ...rest,
+      planDetail: planId,
+      libraryDetail: libraryId,
+    };
+  });
+
+  // ✅ Combine all duePayments and calculate totalDue
+  let totalDue = 0;
+  const allDuePayments = [];
+
+  user.subscriptions.forEach(sub => {
+    if (sub.duePayments?.length) {
+      sub.duePayments.forEach(dp => {
+        allDuePayments.push({
+          paymentId: dp.paymentId,
+          dueAmount: dp.dueAmount || 0,
+        });
+        totalDue += dp.dueAmount || 0;
+      });
+    } else {
+      totalDue += sub.totalDue || 0;
+    }
+  });
+
+  // ✅ Pick latest or active subscription
+  const latestSubscription =
+    user.subscriptions.find(sub => sub.status === true) ||
+    user.subscriptions.reduce(
+      (latest, sub) =>
+        !latest || new Date(sub.startDate) > new Date(latest.startDate)
+          ? sub
+          : latest,
+      null
+    );
+
+  // ✅ Format the final structured response
+  const formattedUser = {
+    userId: user._id,
+    name: user.name,
+    email: user.email,
+    mobile: user.mobileNo,
+    address: user.address,
+    preferredTime: user.preferredTime || "",
+    totalDue,
+    hasMultipleLibraries: user.subscriptions.length > 1,
+    duePayments: allDuePayments,
+    latestSubscription: latestSubscription
+      ? {
+          libraryDetail: {
+            id: latestSubscription.libraryDetail?._id,
+            name: latestSubscription.libraryDetail?.name || "N/A",
+          },
+          planDetail: {
+            id: latestSubscription.planDetail?._id,
+            name: latestSubscription.planDetail?.name || "No Plan",
+            price: latestSubscription.planDetail?.price || 0,
+          },
+          planStartOn: latestSubscription.startDate,
+          planExpireOn: latestSubscription.endDate,
+          planStatus: latestSubscription.status || false,
+          seat: latestSubscription.seatNo || "",
+        }
+      : null,
+  };
+
+  res.status(200).json({
+    status: true,
+    data: formattedUser,
+  });
+} catch (error) {
+  console.error("Error fetching user details:", error);
+  return res.status(500).json({ message: "Internal server error" });
+}
+
+
+
 //   try {
-//     const user = await User.findById(req.params.id);
-//     if (!user) return res.status(404).json({ success: false, message: "User not found" });
-//     res.json({ success: true, data: user });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
+//   const userId = req.user.id;
 
-// // ➡️ Update user
-// export const updateUser = async (req, res) => {
-//   try {
-//     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     if (!user) return res.status(404).json({ success: false, message: "User not found" });
-//     res.json({ success: true, message: "User updated successfully", data: user });
-//   } catch (error) {
-//     res.status(400).json({ success: false, message: error.message });
-//   }
-// };
+//   const user = await User.findById(userId)
+//     .populate("subscriptions.planId", "name price description")
+//     .populate("subscriptions.libraryId", "name address")
+//     .lean();
 
-// // ➡️ Delete user
-// export const deleteUser = async (req, res) => {
-//   try {
-//     const user = await User.findByIdAndDelete(req.params.id);
-//     if (!user) return res.status(404).json({ success: false, message: "User not found" });
-//     res.json({ success: true, message: "User deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
+//   if (!user)
+//     return res.status(404).json({ message: "User details not found", status: false });
 
+//   // ✅ Transform subscriptions: rename planId → planDetail, libraryId → libraryDetail
+//   user.subscriptions = user.subscriptions.map(sub => {
+//     const { planId, libraryId, ...rest } = sub;
+//     return {
+//       ...rest,
+//       planDetail: planId,
+//       libraryDetail: libraryId,
+//     };
+//   });
 
-// import  User from "../models/user";
+//   // ✅ Gather all duePayments + calculate totalDue
+//   const allDuePayments = [];
+//   let totalDue = 0;
+
+//   user.subscriptions.forEach(sub => {
+//     if (sub.duePayments?.length) {
+//       sub.duePayments.forEach(dp => {
+//         allDuePayments.push({
+//           paymentId: dp.paymentId,
+//           dueAmount: dp.dueAmount || 0,
+//           libraryName: sub.libraryDetail?.name || "",
+//           planName: sub.planDetail?.name || "",
+//         });
+//         totalDue += dp.dueAmount || 0;
+//       });
+//     } else {
+//       totalDue += sub.totalDue || 0;
+//     }
+//   });
+
+//   // ✅ Find latest or active subscription
+//   const latestSubscription =
+//     user.subscriptions.find(sub => sub.status === true) ||
+//     user.subscriptions.reduce((latest, sub) =>
+//       !latest || new Date(sub.startDate) > new Date(latest.startDate)
+//         ? sub
+//         : latest,
+//       null
+//     );
+
+//   // ✅ Add computed fields on top level
+//   user.totalDue = totalDue;
+//   user.duePayments = allDuePayments;
+//   user.latestSubscription = latestSubscription;
+
+//   res.status(200).json({
+//     status: true,
+//     data: user,
+//   });
+// } catch (error) {
+//   console.error("Error fetching user details:", error);
+//   return res.status(500).json({ message: "Internal server error" });
+// }
+
+}
 
 
 export const getUserBookings = async (req, res) => {
