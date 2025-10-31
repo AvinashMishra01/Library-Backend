@@ -16,18 +16,37 @@
 
 // module.exports = mongoose.model('Booking', bookingSchema);
 
+// import mongoose from "mongoose";
+
+// const bookingSchema = new mongoose.Schema({
+//   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+//   seat: { type: mongoose.Schema.Types.ObjectId, ref: "Seat" },
+//   room: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
+//   library: { type: mongoose.Schema.Types.ObjectId, ref: "Library" },
+//   plan: { type: mongoose.Schema.Types.ObjectId, ref: "Plan" },
+//   startTime: Date,
+//   endTime: Date,
+//   status: { type: String, enum: ["active", "expired", "cancelled"], default: "active" }
+// }, { timestamps: true });
+
+// const Booking = mongoose.model("Booking", bookingSchema);
+// export default Booking;
+
 import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  seat: { type: mongoose.Schema.Types.ObjectId, ref: "Seat" },
-  room: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
-  library: { type: mongoose.Schema.Types.ObjectId, ref: "Library" },
-  plan: { type: mongoose.Schema.Types.ObjectId, ref: "Plan" },
-  startTime: Date,
-  endTime: Date,
-  status: { type: String, enum: ["active", "expired", "cancelled"], default: "active" }
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  seatId: { type: mongoose.Schema.Types.ObjectId, ref: "Seat", required: true },
+  roomId: { type: mongoose.Schema.Types.ObjectId, ref: "Room", required: true },
+  libraryId: { type: mongoose.Schema.Types.ObjectId, ref: "Library", required: true },
+
+  startTime: { type: Date, required: true },
+  endTime: { type: Date, required: true },
+  status: {
+    type: String,
+    enum: ["reserved", "cancelled", "completed"],
+    default: "reserved",
+  },
 }, { timestamps: true });
 
-const Booking = mongoose.model("Booking", bookingSchema);
-export default Booking;
+export default mongoose.model("Booking", bookingSchema);

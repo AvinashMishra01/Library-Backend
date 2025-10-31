@@ -4,7 +4,6 @@ import  Booking from "../../models/admin-panel/Booking.js";
 import Admin from "../../models/admin-panel/Admin.js";
 import Payment from "../../models/payment-model/Payment.js";
 import { calculateEndDate } from "../../utils/dateCalculator.js";
-import { calculatePaymentStatus } from "../../utils/paidAmountCalculator.js";
 
 export const registerUser = async (req, res) => {
   try {

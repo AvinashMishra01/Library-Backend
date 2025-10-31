@@ -68,3 +68,47 @@ export const getLibraryById = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+
+export const getNearbyLibraries = async (req, res) => {
+  try {
+    const {placeName}= req.body;
+  //   const libraries = await Library.find({})
+  //  .populate({
+  //       path: "rooms",                   // populate rooms array
+  //       populate: {
+  //         path: "seats",                 // populate seats inside each room
+  //         // model: "Seat",                 // specify model if needed
+  //       },
+  //     })                     // get all room details
+  //   .populate("plans") 
+  //   .sort({ createdAt: -1 });
+
+   const libraries = await Library.find({})
+   .populate({
+      path: "rooms",
+    select: "name" 
+    });
+
+    if (!libraries || libraries.length === 0) {
+      return res.status(404).json({
+        message: "No libraries found",
+        data: [],
+        status: false
+      });
+    }
+
+    return res.status(200).json({
+      message: "Libraries fetched successfully",
+      data: libraries,
+      status: true
+    });
+  } catch (error) {
+    console.error("Error fetching libraries:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+      status: false
+    });
+  }
+};

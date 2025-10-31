@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const planSchema = new mongoose.Schema({
-  name: { type: String, required: true },       // e.g. "Monthly", "Yearly", "Special"
-  description: { type: String },                // e.g. "Flat 30% discount"
-  price: { type: Number, required: true },      // e.g. 400
+  name: { type: String, required: true },       
+  description: { type: String },                
+  price: { type: Number, required: true },      
   isActive: { type :String, 
     enum:['0', '1'],
     default:'1'  },

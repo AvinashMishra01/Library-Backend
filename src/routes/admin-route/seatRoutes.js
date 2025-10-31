@@ -27,7 +27,7 @@ router.post(
 
 router.get('/:roomId', 
   authMiddleware,
-  roleMiddleware(["admin"]),
+  roleMiddleware(["admin", "user"]),
   getSeatsByRoom
 )
 
